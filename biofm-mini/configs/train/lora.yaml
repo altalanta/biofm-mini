@@ -1,0 +1,16 @@
+# Overrides to enable LoRA adapters during training
+batch_size: 8
+epochs: 3
+learning_rate: 0.0005
+weight_decay: 0.01
+grad_clip: 1.0
+amp: true
+augment: true
+embedding_dim: 256
+rna_hidden_dim: 512
+dropout: 0.1
+temperature: 0.07
+pretrained: false
+use_lora: true
+lora_rank: 8
+lora_alpha: 16.0

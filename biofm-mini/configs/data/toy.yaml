@@ -1,0 +1,3 @@
+samples: 16
+image_size: 128
+select_hvg: 32

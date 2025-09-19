@@ -1,0 +1,2 @@
+batch_size: 8
+checkpoint: ${paths.output_dir}/checkpoints/last.pt

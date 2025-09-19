@@ -1,0 +1,19 @@
+defaults:
+  - data: toy
+  - train: clip
+  - eval: linear_probe
+
+project:
+  seed: 7
+
+paths:
+  project_root: ${hydra:runtime.cwd}
+  data_dir: ${paths.project_root}/data
+  output_dir: ${paths.project_root}/outputs
+
+hydra:
+  run:
+    dir: ${paths.output_dir}/${now:%Y%m%d_%H%M%S}
+  job_logging:
+    root:
+      level: INFO
