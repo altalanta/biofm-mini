@@ -24,7 +24,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def generate_toy_dataset(
-    base_dir: Path,
+    data_dir: Path,
     n_samples: int = 16,
     image_size: int = 64,
     n_genes: int = 64,
@@ -33,10 +33,10 @@ def generate_toy_dataset(
     """Create a paired toy dataset with simple correlations."""
 
     seed_everything(seed)
-    microscopy_dir = base_dir / "data" / "raw" / "microscopy"
-    scrna_dir = base_dir / "data" / "raw" / "scrna"
-    clinical_dir = base_dir / "data" / "raw" / "clinical"
-    processed_dir = base_dir / "data" / "processed"
+    microscopy_dir = data_dir / "raw" / "microscopy"
+    scrna_dir = data_dir / "raw" / "scrna"
+    clinical_dir = data_dir / "raw" / "clinical"
+    processed_dir = data_dir / "processed"
 
     for directory in [microscopy_dir, scrna_dir, clinical_dir, processed_dir]:
         directory.mkdir(parents=True, exist_ok=True)
@@ -127,7 +127,7 @@ def _synthetic_microscopy(image_size: int, label: int, index: int) -> np.ndarray
     angle = (index / max(1, image_size)) * math.pi
     blob = np.exp(-((xv - label * 0.3) ** 2 + (yv - label * 0.3) ** 2) * 5)
     stripes = 0.5 * (1 + np.sin(10 * (xv * math.cos(angle) + yv * math.sin(angle))))
-    image = (0.6 * blob + 0.4 * stripes)
+    image = 0.6 * blob + 0.4 * stripes
     noise = np.random.normal(scale=0.05, size=(image_size, image_size))
     image = np.clip(image + noise, 0.0, 1.0)
     rgb = np.stack([image, image * (0.7 + 0.3 * label), image[::-1, :]], axis=-1)

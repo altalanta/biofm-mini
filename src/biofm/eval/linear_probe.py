@@ -18,7 +18,9 @@ class ProbeResult:
     metrics: dict[str, BootstrapResult]
 
 
-def fit_linear_probe(embeddings: np.ndarray, labels: np.ndarray, seed: int = 7) -> ProbeResult:
+def fit_linear_probe(
+    embeddings: np.ndarray, labels: np.ndarray, seed: int = 7
+) -> ProbeResult:
     if embeddings.ndim != 2:
         raise ValueError("Embeddings must be a 2D array")
     if embeddings.shape[0] != labels.shape[0]:
@@ -43,7 +45,9 @@ def fit_linear_probe(embeddings: np.ndarray, labels: np.ndarray, seed: int = 7) 
     return ProbeResult(model=pipeline, metrics=metrics)
 
 
-def probe_and_report(embeddings: np.ndarray, labels: np.ndarray) -> tuple[ProbeResult, str]:
+def probe_and_report(
+    embeddings: np.ndarray, labels: np.ndarray
+) -> tuple[ProbeResult, str]:
     result = fit_linear_probe(embeddings, labels)
     summary_lines = []
     for name, metric in result.metrics.items():

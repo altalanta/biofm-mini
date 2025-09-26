@@ -25,11 +25,11 @@ class BioFMClipModel(nn.Module):
         super().__init__()
         self.image_encoder = image_encoder
         self.rna_encoder = rna_encoder
-        
+
         # Projectors map from encoder embedding_dim to shared projector_dim
         image_embedding_dim = image_encoder.head.out_features
         rna_embedding_dim = rna_encoder.network[-1].out_features
-        
+
         self.image_projector = TwoLayerProjector(
             input_dim=image_embedding_dim,
             hidden_dim=projector_dim,

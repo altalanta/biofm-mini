@@ -57,7 +57,9 @@ def bootstrap_metric(
     return BootstrapResult(point_estimate=point, ci_low=low, ci_high=high)
 
 
-def summarise_metrics(labels: Iterable[int], scores: Iterable[float]) -> dict[str, BootstrapResult]:
+def summarise_metrics(
+    labels: Iterable[int], scores: Iterable[float]
+) -> dict[str, BootstrapResult]:
     results = {
         "auroc": bootstrap_metric(compute_auroc, labels, scores),
         "auprc": bootstrap_metric(compute_auprc, labels, scores),
@@ -82,7 +84,9 @@ def decision_curve_analysis(
         false_positive = np.logical_and(predictions, labels_arr == 0).sum()
         n = len(labels_arr)
         nb = (true_positive / n) - (false_positive / n) * (threshold / (1 - threshold))
-        net_benefits.append({"threshold": threshold, "net_benefit": nb, "prevalence": prevalence})
+        net_benefits.append(
+            {"threshold": threshold, "net_benefit": nb, "prevalence": prevalence}
+        )
     return pd.DataFrame(net_benefits)
 
 
