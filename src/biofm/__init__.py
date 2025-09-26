@@ -1,14 +1,8 @@
-"""biofm-mini package exposing high-level utilities."""
+"""BioFM package namespace."""
 
-from importlib import metadata
+try:
+    from ._version import __version__
+except ImportError:  # pragma: no cover - package not built with setuptools_scm yet
+    __version__ = "0.0.0"
 
 __all__ = ["__version__"]
-
-
-def __getattr__(name: str) -> str:
-    if name == "__version__":
-        try:
-            return metadata.version("biofm-mini")
-        except metadata.PackageNotFoundError:  # pragma: no cover
-            return "0.0.0"
-    raise AttributeError(name)

@@ -22,7 +22,9 @@ def log_normalise(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(log_norm, index=df.index, columns=df.columns)
 
 
-def preprocess_expression(input_path: Path, output_path: Path) -> tuple[Path, pd.DataFrame]:
+def preprocess_expression(
+    input_path: Path, output_path: Path
+) -> tuple[Path, pd.DataFrame]:
     df = pd.read_csv(input_path, index_col=0)
     df = filter_genes(df)
     df = log_normalise(df)

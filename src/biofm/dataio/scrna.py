@@ -5,13 +5,13 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pandas as pd
-import torch
-from torch.utils.data import Dataset
 
 from biofm.datamodels import ScrnaSample
+from biofm.deps import require_torch
 
 LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +23,15 @@ except ImportError:  # pragma: no cover - optional dependency
     HAS_SCANPY = False
 
 
-class ScrnaDataset(Dataset):
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import torch
+    from torch.utils.data import Dataset as TorchDataset
+else:  # pragma: no cover - runtime uses duck typing
+    torch = Any  # type: ignore
+    TorchDataset = object
+
+
+class ScrnaDataset(TorchDataset):
     """In-memory dataset of scRNA profiles aligned to samples."""
 
     def __init__(
@@ -39,7 +47,8 @@ class ScrnaDataset(Dataset):
             matrix = _normalise_counts(matrix)
         if select_hvg is not None and select_hvg < matrix.shape[1]:
             matrix, self.gene_names = _select_hvg(matrix, self.gene_names, select_hvg)
-        self.matrix = torch.from_numpy(matrix.astype(np.float32))
+        torch_module = require_torch()
+        self.matrix = torch_module.from_numpy(matrix.astype(np.float32))
 
     def __len__(self) -> int:
         return len(self.samples)
@@ -56,7 +65,12 @@ def discover_scrna_samples(directory: Path) -> list[ScrnaSample]:
 
     samples: list[ScrnaSample] = []
     h5ad_files = list(directory.glob("*.h5ad"))
-    if h5ad_files and HAS_SCANPY:
+    if h5ad_files:
+        if not HAS_SCANPY:
+            raise RuntimeError(
+                "Found .h5ad files but optional dependency 'scanpy' is not installed. "
+                "Install biofm[scanpy] to enable this pathway."
+            )
         samples.extend(_samples_from_h5ad(h5ad_files[0]))
     else:
         for path in sorted(directory.glob("*.csv")):
@@ -105,7 +119,11 @@ def _load_all_samples(samples: Sequence[ScrnaSample]) -> tuple[np.ndarray, list[
     gene_names: list[str] | None = None
     for sample in samples:
         path = sample.expression_path
-        if path.suffix.lower() == ".h5ad" and sample.row_index is not None and HAS_SCANPY:
+        if (
+            path.suffix.lower() == ".h5ad"
+            and sample.row_index is not None
+            and HAS_SCANPY
+        ):
             vector, genes = _read_h5ad_row(path, sample.row_index)
         else:
             vector, genes = _read_csv_expression(path)
@@ -151,14 +169,19 @@ def _normalise_counts(matrix: np.ndarray) -> np.ndarray:
     return np.log1p(matrix)
 
 
-def _select_hvg(matrix: np.ndarray, genes: list[str], k: int) -> tuple[np.ndarray, list[str]]:
+def _select_hvg(
+    matrix: np.ndarray, genes: list[str], k: int
+) -> tuple[np.ndarray, list[str]]:
     variances = matrix.var(axis=0)
     top_idx = np.argsort(variances)[::-1][:k]
     return matrix[:, top_idx], [genes[i] for i in top_idx]
 
 
-def collate_scrna(batch: Iterable[dict[str, torch.Tensor | str]]) -> dict[str, torch.Tensor | list[str]]:
-    expressions = torch.stack([item["expression"] for item in batch])
+def collate_scrna(
+    batch: Iterable[dict[str, torch.Tensor | str]],
+) -> dict[str, torch.Tensor | list[str]]:
+    torch_module = require_torch()
+    expressions = torch_module.stack([item["expression"] for item in batch])
     sample_ids = [str(item["sample_id"]) for item in batch]
     return {"expression": expressions, "sample_ids": sample_ids}
 

@@ -16,7 +16,11 @@ LOGGER = logging.getLogger(__name__)
 class ImageEncoder(nn.Module):
     """ResNet18 backbone with a projection head."""
 
-    def __init__(self, embedding_dim: int = 256, pretrained: bool = False) -> None:
+    def __init__(
+        self,
+        embedding_dim: int = 256,
+        pretrained: bool = False,
+    ) -> None:
         super().__init__()
         weights = models.ResNet18_Weights.DEFAULT if pretrained else None
         backbone = models.resnet18(weights=weights)
@@ -56,7 +60,11 @@ class RNAMlpEncoder(nn.Module):
 
 
 def create_image_encoder(embedding_dim: int, pretrained: bool = False) -> ImageEncoder:
-    LOGGER.info("Initialising image encoder (embed_dim=%s, pretrained=%s)", embedding_dim, pretrained)
+    LOGGER.info(
+        "Initialising image encoder (embed_dim=%s, pretrained=%s)",
+        embedding_dim,
+        pretrained,
+    )
     return ImageEncoder(embedding_dim=embedding_dim, pretrained=pretrained)
 
 
@@ -66,7 +74,11 @@ def create_rna_encoder(
     hidden_dim: int = 512,
     dropout: float = 0.1,
 ) -> RNAMlpEncoder:
-    LOGGER.info("Initialising RNA encoder (input_dim=%s, embed_dim=%s)", input_dim, embedding_dim)
+    LOGGER.info(
+        "Initialising RNA encoder (input_dim=%s, embed_dim=%s)",
+        input_dim,
+        embedding_dim,
+    )
     return RNAMlpEncoder(
         input_dim=input_dim,
         hidden_dim=hidden_dim,

@@ -17,7 +17,9 @@ def normalise_tile(tile: Image.Image) -> Image.Image:
     return Image.fromarray((array * 255).astype(np.uint8))
 
 
-def tile_image(image_path: Path, tile_size: int = 128, stride: int | None = None) -> list[Image.Image]:
+def tile_image(
+    image_path: Path, tile_size: int = 128, stride: int | None = None
+) -> list[Image.Image]:
     stride = stride or tile_size
     with Image.open(image_path) as image:
         image = image.convert("RGB")
@@ -32,7 +34,9 @@ def tile_image(image_path: Path, tile_size: int = 128, stride: int | None = None
     return tiles
 
 
-def preprocess_and_save(image_path: Path, output_dir: Path, tile_size: int = 128) -> list[Path]:
+def preprocess_and_save(
+    image_path: Path, output_dir: Path, tile_size: int = 128
+) -> list[Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     tiles = tile_image(image_path, tile_size=tile_size)
     saved_paths = []

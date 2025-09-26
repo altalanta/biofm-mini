@@ -11,7 +11,7 @@ from torch import nn
 LOGGER = logging.getLogger(__name__)
 
 try:  # pragma: no cover - optional speedup
-    import bitsandbytes as bnb  # type: ignore
+    import bitsandbytes  # type: ignore  # noqa: F401
 
     HAS_BNB = True
 except ImportError:  # pragma: no cover - optional speedup
@@ -31,7 +31,7 @@ class LoRAAdapter(nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self) -> None:
-        nn.init.kaiming_uniform_(self.lora_up.weight, a=5 ** 0.5)
+        nn.init.kaiming_uniform_(self.lora_up.weight, a=5**0.5)
         nn.init.zeros_(self.lora_down.weight)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:  # type: ignore[override]
@@ -62,13 +62,17 @@ def apply_lora_adapters(
         setattr(parent, attr_name, adapter)
         replaced += 1
     if replaced == 0:
-        LOGGER.info("LoRA requested but no matching modules were found; model left unchanged")
+        LOGGER.info(
+            "LoRA requested but no matching modules were found; model left unchanged"
+        )
     else:
         LOGGER.info("Enabled LoRA on %s modules (bitsandbytes=%s)", replaced, HAS_BNB)
     return replaced
 
 
-def _resolve_parent(model: nn.Module, qualified_name: str) -> tuple[nn.Module | None, str]:
+def _resolve_parent(
+    model: nn.Module, qualified_name: str
+) -> tuple[nn.Module | None, str]:
     parts = qualified_name.split(".")
     parent = model
     for part in parts[:-1]:

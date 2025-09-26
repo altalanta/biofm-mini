@@ -5,19 +5,26 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
-import torch
 from PIL import Image
-from torch.utils.data import Dataset
-from torchvision import transforms
 
 from biofm.datamodels import MicroscopySample
+from biofm.deps import require_torch, require_torch_transforms
 
 LOGGER = logging.getLogger(__name__)
 SUPPORTED_EXTENSIONS = {".png", ".tif", ".tiff"}
 
 
-class MicroscopyDataset(Dataset):
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import torch
+    from torch.utils.data import Dataset as TorchDataset
+else:  # pragma: no cover - runtime uses duck typing
+    torch = Any  # type: ignore
+    TorchDataset = object
+
+
+class MicroscopyDataset(TorchDataset):
     """Torch dataset wrapping microscopy tiles."""
 
     def __init__(
@@ -26,6 +33,7 @@ class MicroscopyDataset(Dataset):
         image_size: int = 224,
         augment: bool = False,
     ) -> None:
+        transforms = require_torch_transforms()
         self.samples = list(samples)
         base_transforms = [
             transforms.Resize((image_size, image_size)),
@@ -94,7 +102,10 @@ def load_microscopy_dataset(
     return MicroscopyDataset(samples=samples, image_size=image_size, augment=augment)
 
 
-def collate_microscopy(batch: Iterable[dict[str, torch.Tensor | str]]) -> dict[str, torch.Tensor | list[str]]:
+def collate_microscopy(
+    batch: Iterable[dict[str, torch.Tensor | str]],
+) -> dict[str, torch.Tensor | list[str]]:
+    torch = require_torch()
     pixel_values = torch.stack([item["pixel_values"] for item in batch])
     sample_ids = [str(item["sample_id"]) for item in batch]
     return {"pixel_values": pixel_values, "sample_ids": sample_ids}

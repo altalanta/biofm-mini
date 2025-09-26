@@ -119,7 +119,9 @@ def validate_dataset_counts(bundle: DatasetBundle) -> dict[str, float]:
 
     label_counts = _count_labels(bundle.clinical)
     if len({label for label, count in label_counts.items() if count > 0}) < 2:
-        raise ValueError("Clinical labels must include both classes for contrastive training")
+        raise ValueError(
+            "Clinical labels must include both classes for contrastive training"
+        )
 
     average_genes = sum(sample.num_genes for sample in bundle.scrna) / n_samples
     average_library = sum(sample.library_size for sample in bundle.scrna) / n_samples
