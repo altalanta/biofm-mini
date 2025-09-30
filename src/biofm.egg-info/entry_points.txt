@@ -1,0 +1,2 @@
+[console_scripts]
+biofm = biofm.cli:main_cli

@@ -1,3 +1,88 @@
+Metadata-Version: 2.4
+Name: biofm
+Version: 0.1.0.dev1+gaecbc363b
+Summary: Laptop-first multimodal foundation model mini-stack for microscopy, scRNA, and clinical data
+Author-email: Artemis Folle <artemis@example.com>
+License: MIT License
+        
+        Copyright (c) 2024 Artemis Folle
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Project-URL: Homepage, https://github.com/altalanta/biofm-mini
+Project-URL: Documentation, https://altalanta.github.io/biofm-mini
+Project-URL: Bug Tracker, https://github.com/altalanta/biofm-mini/issues
+Keywords: multimodal,foundation model,microscopy,single-cell,clinical
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: ==3.11.*
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: torch<2.4,>=2.2
+Requires-Dist: torchvision<0.19,>=0.17
+Requires-Dist: numpy>=1.23
+Requires-Dist: pandas>=2.0
+Requires-Dist: scikit-learn>=1.3
+Requires-Dist: pydantic>=2.5
+Requires-Dist: hydra-core>=1.3
+Requires-Dist: pyarrow>=14.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: typer>=0.9
+Requires-Dist: rich>=13.7
+Requires-Dist: tqdm>=4.66
+Requires-Dist: Pillow>=10.0
+Requires-Dist: packaging>=23.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.1; extra == "dev"
+Requires-Dist: pytest-cov>=4.1; extra == "dev"
+Requires-Dist: pytest-mock>=3.12; extra == "dev"
+Requires-Dist: coverage[toml]>=7.4; extra == "dev"
+Requires-Dist: ruff>=0.2; extra == "dev"
+Requires-Dist: black>=24.4; extra == "dev"
+Requires-Dist: isort>=5.12; extra == "dev"
+Requires-Dist: mypy>=1.8; extra == "dev"
+Requires-Dist: pre-commit>=3.6; extra == "dev"
+Requires-Dist: types-Pillow; extra == "dev"
+Requires-Dist: types-PyYAML; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: mkdocs>=1.5; extra == "docs"
+Requires-Dist: mkdocs-material>=9.5; extra == "docs"
+Requires-Dist: mkdocstrings[python]>=0.24; extra == "docs"
+Requires-Dist: mkdocs-gen-files>=0.5; extra == "docs"
+Requires-Dist: mkdocs-literate-nav>=0.6; extra == "docs"
+Provides-Extra: gpu
+Requires-Dist: torch<2.4,>=2.2; extra == "gpu"
+Requires-Dist: torchvision<0.19,>=0.17; extra == "gpu"
+Requires-Dist: torchaudio<2.4,>=2.2; extra == "gpu"
+Provides-Extra: viz
+Requires-Dist: matplotlib>=3.8; extra == "viz"
+Requires-Dist: plotly>=5.18; extra == "viz"
+Provides-Extra: scanpy
+Requires-Dist: scanpy>=1.9; extra == "scanpy"
+Requires-Dist: anndata>=0.9; extra == "scanpy"
+Dynamic: license-file
+
 # biofm-mini
 
 [![CI](https://github.com/altalanta/biofm-mini/actions/workflows/ci.yml/badge.svg)](https://github.com/altalanta/biofm-mini/actions/workflows/ci.yml)
