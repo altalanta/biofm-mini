@@ -119,7 +119,6 @@ testpaths = ["tests"]
 branch = true
 source = ["biofm"]
 
-disable_warnings = true
 
 [tool.coverage.report]
 exclude_also = [
