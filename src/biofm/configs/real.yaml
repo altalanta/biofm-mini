@@ -1,0 +1,43 @@
+project:
+  seed: 7
+
+paths:
+  data_dir: data
+  output_dir: outputs
+
+data:
+  profile: real
+  samples: null
+  image_size: 224
+  select_hvg: 512
+  n_genes: 4096
+  num_workers: 4
+
+train:
+  batch_size: 8
+  epochs: 5
+  learning_rate: 0.0003
+  weight_decay: 0.01
+  grad_clip: 1.0
+  amp: auto
+  augment: true
+  embedding_dim: 256
+  rna_hidden_dim: 512
+  dropout: 0.2
+  temperature: 0.07
+  pretrained: true
+  use_lora: false
+  lora_rank: 8
+  lora_alpha: 16.0
+
+eval:
+  method: linear_probe
+  batch_size: 16
+  bootstrap_samples: 512
+  checkpoint: null
+  knn:
+    k: 5
+    metric: cosine
+
+report:
+  bootstrap_samples: 512
