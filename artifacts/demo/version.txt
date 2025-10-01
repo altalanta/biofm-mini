@@ -1,0 +1,3 @@
+git_sha=663e922
+package_version=0.1.0.dev3+g663e92287.d20251001
+seed=1337

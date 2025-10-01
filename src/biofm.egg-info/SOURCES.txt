@@ -1,3 +1,6 @@
+.coverage
+.coverage 2
+.gitattributes
 .gitignore
 .pre-commit-config.yaml
 CODE_OF_CONDUCT.md
@@ -9,6 +12,7 @@ LICENSE
 MODEL_CARD.md
 Makefile
 README.md
+coverage.xml
 pyproject.toml
 .github/workflows/ci.yml
 notebooks/01_data_validation.ipynb
@@ -39,6 +43,7 @@ src/biofm/dataio/toydata.py
 src/biofm/eval/__init__.py
 src/biofm/eval/linear_probe.py
 src/biofm/eval/metrics.py
+src/biofm/eval/plots.py
 src/biofm/models/__init__.py
 src/biofm/models/clip.py
 src/biofm/models/encoders.py
@@ -57,11 +62,13 @@ src/biofm/utils/pipeline.py
 src/biofm/utils/registry.py
 src/biofm/utils/seeds.py
 tests/conftest.py
+tests/test_artifacts.py
 tests/test_cli.py
 tests/test_clip_step.py
 tests/test_configuration.py
 tests/test_datamodels.py
 tests/test_determinism.py
+tests/test_endpoints.py
 tests/test_eval_metrics.py
 tests/test_metrics.py
 tests/test_pipeline.py

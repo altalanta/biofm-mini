@@ -1,4 +1,4 @@
-.PHONY: setup lint type test format train eval embed demo smoke report clean
+.PHONY: setup lint type test format train eval embed demo smoke report clean clean-artifacts
 
 PYTHON ?= python
 
@@ -21,7 +21,7 @@ format:
 	isort src tests
 
 test:
-	pytest
+	pytest -q --maxfail=1 --disable-warnings --cov=biofm --cov-report=term-missing
 
 train:
 	biofm train
@@ -50,8 +50,11 @@ report:
 	fi
 
 demo:
-	biofm report --table
+	$(PYTHON) -m scripts.demo_end_to_end
 
 clean:
 	rm -rf .mypy_cache .pytest_cache .ruff_cache */__pycache__
 	rm -rf outputs/smoke
+
+clean-artifacts:
+	rm -rf artifacts/demo
