@@ -66,6 +66,37 @@ def summarise_metrics(
     return results
 
 
+def compute_ece(labels: Iterable[int], scores: Iterable[float], n_bins: int = 10) -> float:
+    """Compute Expected Calibration Error (ECE).
+    
+    Args:
+        labels: True binary labels (0 or 1)
+        scores: Predicted probabilities
+        n_bins: Number of bins to use for calibration
+        
+    Returns:
+        ECE value as a float
+    """
+    labels_arr = np.asarray(list(labels))
+    scores_arr = np.asarray(list(scores))
+    
+    bins = np.linspace(0.0, 1.0, n_bins + 1)
+    bin_indices = np.digitize(scores_arr, bins) - 1
+    
+    ece_val = 0.0
+    for i in range(n_bins):
+        mask = bin_indices == i
+        if not np.any(mask):
+            continue
+        
+        conf = scores_arr[mask].mean()
+        acc = labels_arr[mask].mean()
+        weight = mask.sum() / len(labels_arr)
+        ece_val += np.abs(acc - conf) * weight
+    
+    return float(ece_val)
+
+
 def decision_curve_analysis(
     labels: Iterable[int],
     scores: Iterable[float],
@@ -93,6 +124,7 @@ __all__ = [
     "BootstrapResult",
     "compute_auroc",
     "compute_auprc",
+    "compute_ece",
     "bootstrap_metric",
     "summarise_metrics",
     "decision_curve_analysis",

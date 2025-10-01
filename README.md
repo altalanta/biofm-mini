@@ -68,6 +68,59 @@ Additional governance documentation:
 - [CONTRIBUTING.md](CONTRIBUTING.md): Contribution guidelines and development practices  
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md): Community standards and behavior expectations
 
+## Deterministic Demo
+
+Run a tiny, reproducible pipeline and view artifacts:
+
+```bash
+make demo
+ls -1 artifacts/demo
+```
+
+This creates a deterministic end-to-end demonstration with:
+
+### Generated Artifacts
+- **`metrics.json`**: Core classification metrics (AUROC, AUPRC, accuracy, precision, recall, F1, ECE)
+- **`roc_curve.png`**: Receiver Operating Characteristic curve plot
+- **`pr_curve.png`**: Precision-Recall curve plot  
+- **`calibration_curve.png`**: Model calibration analysis
+- **`confusion_matrix.png`**: Confusion matrix visualization
+- **`version.txt`**: Git SHA, package version, and seed for reproducibility
+
+### Reproducibility Features
+- **Fixed seed (1337)**: Ensures identical results across runs
+- **Synthetic data**: 1000-sample binary classification with ~30% class imbalance
+- **Deterministic splits**: Fixed 700/300 train/test division
+- **Statistical validation**: Tests verify metrics meet quality thresholds
+
+### Statistical Tests and Thresholds
+The demo includes comprehensive endpoint tests with the following quality gates:
+
+- **AUROC ≥ 0.70**: Model discrimination above random baseline
+- **AUPRC ≥ prevalence + 0.10**: Precision-recall performance shows meaningful uplift  
+- **Accuracy ≥ 0.70**: Overall classification performance threshold
+- **ECE ≤ 0.10**: Expected Calibration Error for prediction reliability
+- **Determinism**: Identical results within 1e-6 tolerance across runs
+
+These thresholds reflect sanity floors for model performance over prevalence baselines and ensure calibration quality suitable for downstream decision-making.
+
+### Usage
+```bash
+# Run the demo
+make demo
+
+# View artifacts
+tree artifacts/demo
+
+# Clean artifacts  
+make clean-artifacts
+
+# Run statistical tests
+make test
+```
+
+The demo completes in under 30 seconds on CPU and produces identical metrics on every run, making it ideal for CI/CD validation and reproducibility verification.
+
 ### How this maps to the role
 - Contribute to ML models… (data wrangling/curation/validation)
 - Lead data management, software infrastructure and AI/ML workflow best practices and policies
