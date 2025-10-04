@@ -3,7 +3,7 @@ requires = ["setuptools>=69", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "biofm"
+name = "biofm-mini"
 dynamic = ["version"]
 description = "Laptop-first multimodal foundation model mini-stack for microscopy, scRNA, and clinical data"
 readme = "README.md"
@@ -44,6 +44,8 @@ dev = [
   "pytest>=8.1",
   "pytest-cov>=4.1",
   "pytest-mock>=3.12",
+  "pytest-benchmark>=4.0",
+  "hypothesis>=6.98",
   "coverage[toml]>=7.4",
   "ruff>=0.2",
   "black>=24.4",
@@ -52,6 +54,9 @@ dev = [
   "pre-commit>=3.6",
   "types-Pillow",
   "types-PyYAML",
+  "mkdocs>=1.5",
+  "mkdocs-material>=9.5",
+  "mkdocstrings[python]>=0.24",
 ]
 docs = [
   "mkdocs>=1.5",
