@@ -168,4 +168,16 @@ __all__ = [
     "DatasetBundle",
     "build_dataset_bundle",
     "validate_dataset_counts",
+    "subset_bundle",
 ]
+
+
+
+def subset_bundle(bundle: "DatasetBundle", sample_ids: Iterable[str]) -> "DatasetBundle":
+    id_set = set(sample_ids)
+    microscopy = [sample for sample in bundle.microscopy if sample.sample_id in id_set]
+    scrna = [sample for sample in bundle.scrna if sample.sample_id in id_set]
+    clinical = [record for record in bundle.clinical if record.sample_id in id_set]
+    if not microscopy or not scrna or not clinical:
+        raise ValueError("Subset bundle is empty; check sample ids")
+    return DatasetBundle(microscopy=microscopy, scrna=scrna, clinical=clinical)

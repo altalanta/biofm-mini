@@ -10,6 +10,8 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score, roc_auc_score
 
+from biofm.eval.bootstrap import bca_interval, bootstrap_statistics, jackknife_statistics
+
 LOGGER = logging.getLogger(__name__)
 
 MetricFn = Callable[[np.ndarray, np.ndarray], float]
@@ -39,20 +41,17 @@ def bootstrap_metric(
 ) -> BootstrapResult:
     labels_arr = np.asarray(list(labels))
     scores_arr = np.asarray(list(scores))
+    n = len(labels_arr)
+    indices = np.arange(n)
     rng = np.random.default_rng(seed)
-    values = []
-    for _ in range(n_bootstrap):
-        indices = rng.integers(0, len(labels_arr), len(labels_arr))
-        try:
-            value = metric_fn(labels_arr[indices], scores_arr[indices])
-            values.append(value)
-        except ValueError:
-            continue
-    if not values:
-        raise ValueError("Bootstrap failed: metric undefined for sampled folds")
-    values_arr = np.asarray(values)
-    point = metric_fn(labels_arr, scores_arr)
-    low, high = np.percentile(values_arr, [2.5, 97.5])
+
+    def stat(idx: np.ndarray) -> float:
+        return metric_fn(labels_arr[idx], scores_arr[idx])
+
+    point = stat(indices)
+    boot = bootstrap_statistics(n, rng, stat, n_bootstrap)
+    jack = jackknife_statistics(n, stat)
+    low, high = bca_interval(point, boot, jack)
     return BootstrapResult(point_estimate=point, ci_low=low, ci_high=high)
 
 
@@ -67,33 +66,20 @@ def summarise_metrics(
 
 
 def compute_ece(labels: Iterable[int], scores: Iterable[float], n_bins: int = 10) -> float:
-    """Compute Expected Calibration Error (ECE).
-    
-    Args:
-        labels: True binary labels (0 or 1)
-        scores: Predicted probabilities
-        n_bins: Number of bins to use for calibration
-        
-    Returns:
-        ECE value as a float
-    """
     labels_arr = np.asarray(list(labels))
     scores_arr = np.asarray(list(scores))
-    
     bins = np.linspace(0.0, 1.0, n_bins + 1)
     bin_indices = np.digitize(scores_arr, bins) - 1
-    
+
     ece_val = 0.0
     for i in range(n_bins):
         mask = bin_indices == i
         if not np.any(mask):
             continue
-        
         conf = scores_arr[mask].mean()
         acc = labels_arr[mask].mean()
         weight = mask.sum() / len(labels_arr)
-        ece_val += np.abs(acc - conf) * weight
-    
+        ece_val += abs(acc - conf) * weight
     return float(ece_val)
 
 
@@ -120,6 +106,47 @@ def decision_curve_analysis(
     return pd.DataFrame(net_benefits)
 
 
+def bootstrap_classification_metrics(
+    labels: Iterable[int],
+    scores: Iterable[float],
+    *,
+    n_bootstrap: int = 1000,
+    seed: int = 1337,
+) -> dict[str, dict[str, float]]:
+    labels_arr = np.asarray(list(labels), dtype=int)
+    scores_arr = np.asarray(list(scores), dtype=float)
+    preds = (scores_arr >= 0.5).astype(int)
+    n = len(labels_arr)
+    indices = np.arange(n)
+    rng = np.random.default_rng(seed)
+
+    def accuracy_fn(idx: np.ndarray) -> float:
+        return float((preds[idx] == labels_arr[idx]).mean())
+
+    def ece_fn(idx: np.ndarray) -> float:
+        return compute_ece(labels_arr[idx], scores_arr[idx], n_bins=10)
+
+    metric_functions: dict[str, Callable[[np.ndarray], float]] = {
+        "auroc": lambda idx: compute_auroc(labels_arr[idx], scores_arr[idx]),
+        "auprc": lambda idx: compute_auprc(labels_arr[idx], scores_arr[idx]),
+        "accuracy": accuracy_fn,
+        "ece": ece_fn,
+    }
+
+    results: dict[str, dict[str, float]] = {}
+    for name, fn in metric_functions.items():
+        theta = fn(indices)
+        boot = bootstrap_statistics(n, rng, fn, n_bootstrap)
+        jack = jackknife_statistics(n, fn)
+        ci_low, ci_high = bca_interval(theta, boot, jack)
+        results[name] = {
+            "point_estimate": float(theta),
+            "ci_low": float(ci_low),
+            "ci_high": float(ci_high),
+        }
+    return results
+
+
 __all__ = [
     "BootstrapResult",
     "compute_auroc",
@@ -128,4 +155,5 @@ __all__ = [
     "bootstrap_metric",
     "summarise_metrics",
     "decision_curve_analysis",
+    "bootstrap_classification_metrics",
 ]
